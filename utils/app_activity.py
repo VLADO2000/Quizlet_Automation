@@ -14,6 +14,10 @@ and there i also need a driver for app info fetching
 
 from logger import logger
 import subprocess
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.common.exceptions import NoSuchElementException
+
+from appium_manager import appium_service, android_driver
 
 APP_ICON = "//android.widget.TextView[@content-desc=\"Quizlet\"]"
 
@@ -24,8 +28,8 @@ def get_focused_app(device):
     :param device:
     :return:
     """
-    command = ["adb", "-s", device, "shell", "dumpsys", "window", "|",
-               "grep", "-E", "mCurrentFocus|mFocusedApp"]
+    command = ["adb", "-s", device, "shell", "dumpsys", "window", " | ",
+               "grep", "-E", "'mCurrentFocus|mFocusedApp'"]
 
     try:
         result = subprocess.run(command, capture_output=True, text=True, check=True)
@@ -38,6 +42,31 @@ def get_focused_app(device):
 
     return output
 
-def get_app_activity(device):
-    pass
+
+def get_app_activity(device, options):
+    with appium_service():
+        with android_driver(options=options) as d:
+            screen_size = d.get_window_size()
+            screen_width = screen_size['width']
+            screen_height = screen_size['height']
+
+            d.swipe(int(screen_width*0.5),
+                    int(screen_height*0.8),
+                    int(screen_width*0.5),
+                    int(screen_height*0.2),
+                    500)
+            try:
+                element = d.find_element(by=AppiumBy.XPATH, value=APP_ICON)
+                element.click()
+                d.implicitly_wait(25, time_unit='seconds')
+                logger.info("Scroll has happend")
+                logger.info(f"App is visible")
+            except NoSuchElementException as e:
+                logger.error(f"App is not visible: {e}")
+                return None
+            finally:
+
+                app_activity = get_focused_app(device)
+                return app_activity
+
 

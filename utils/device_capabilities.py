@@ -59,7 +59,7 @@ def get_device_version(device):
 
     #A lot of resutls returns by release pattern as list of strings
     device_version = result.stdout.strip().splitlines()[0]
-    device_version = device_version.split(":")[1].strip(" []")
+    device_version = device_version.split(":")[1].strip().strip("[]")
     logger.info(f"Fetched {device} version: {device_version}")
 
     return device_version
@@ -122,6 +122,7 @@ def get_device_capabilities():
         "deviceName": device,
         "platformVersion": str(float(device_version)),
     }
+
 
     return device_capabilites
 
