@@ -6,8 +6,10 @@ def get_android_capabilities():
   Returns Android capabilities
   """
   device_capabilities = get_device_capabilities()
+
+  #Should be used only after carefull consideration
   app_activity = get_app_activity(device_capabilities["deviceName"], device_capabilities)
-  print(app_activity)
+
   return {
       "platformName": "Android",
       "platformVersion": device_capabilities["platformVersion"],
@@ -17,5 +19,5 @@ def get_android_capabilities():
       "appActivity": ".ui.RootActivity"
     }
 
-get_android_capabilities()
+
 
